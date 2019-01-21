@@ -85,7 +85,7 @@ bool R, L, U, D; // boolean variables para definir posición del joystick
 volatile uint32_t Joystick_V, Joystick_H, LDR, Potentiometer; // Valores analógicos de los ejes X e Y del Joystic respectivamente y de la LDR y el potenciómetro
 uint32_t num; // variable para representar en el display
 int Red_light, Green_light, Blue_light;
-
+volatile bool flag = 0;
 //Funciones
 
 void map ()// funcion encargada de traducir el valor analógico leído del Joystick a valores de dcha, izq, arriba y abajo o lo que se precise
@@ -104,126 +104,126 @@ void map ()// funcion encargada de traducir el valor analógico leído del Joystic
 void Display_control (uint32_t P) // Decodifica el valor del potenciómetro y lo representa en el display
 {
 		num = P%10; //asocia al valor de la lectura analógica un número entre 0 y 97
-		switch (num)
-		{
-			case 0:		// Display = 0xFC; //Respresenta el número 0 en el display ("0b11111100")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);								
-				break;				
-			}
-			case 1:		// Display = 0x60; //Respresenta el número 0 en el display ("0b01100000")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
-				break;				
-			}
-			case 2:		// Display = 0xDA; //Respresenta el número 0 en el display ("0b11011010")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-				break;				
-			}
-			case 3:		// Display = 0xF2; //Respresenta el número 0 en el display ("0b11110010")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-				break;				
-			}
-			case 4:		// Display = 0x66; //Respresenta el número 0 en el display ("0b01100110")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
-				break;				
-			}
-			case 5:		// Display = 0xB6; //Respresenta el número 0 en el display ("0b10110110")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-				break;				
-			}
-			case 6:		// Display = 0xBE; //Respresenta el número 0 en el display ("0b10111110")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-				break;				
-			}
-			case 7:		// Display = 0xE0; //Respresenta el número 0 en el display ("0b11100000")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
-				break;				
-			}
-			case 8:		// Display = 0xFE; //Respresenta el número 0 en el display ("0b11111110")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-								break;				
-			}
-			case 9:		// Display = 0xE6; //Respresenta el número 0 en el display ("0b11100110")
-			{
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-								break;
-			}								
-		}
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
+//		switch (num)
+//		{
+//			case 0:		// Display = 0xFC; //Respresenta el número 0 en el display ("0b11111100")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);								
+//				break;				
+//			}
+//			case 1:		// Display = 0x60; //Respresenta el número 0 en el display ("0b01100000")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
+//				break;				
+//			}
+//			case 2:		// Display = 0xDA; //Respresenta el número 0 en el display ("0b11011010")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
+//				break;				
+//			}
+//			case 3:		// Display = 0xF2; //Respresenta el número 0 en el display ("0b11110010")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
+//				break;				
+//			}
+//			case 4:		// Display = 0x66; //Respresenta el número 0 en el display ("0b01100110")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
+//				break;				
+//			}
+//			case 5:		// Display = 0xB6; //Respresenta el número 0 en el display ("0b10110110")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
+//				break;				
+//			}
+//			case 6:		// Display = 0xBE; //Respresenta el número 0 en el display ("0b10111110")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
+//				break;				
+//			}
+//			case 7:		// Display = 0xE0; //Respresenta el número 0 en el display ("0b11100000")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
+//				break;				
+//			}
+//			case 8:		// Display = 0xFE; //Respresenta el número 0 en el display ("0b11111110")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
+//								break;				
+//			}
+//			case 9:		// Display = 0xE6; //Respresenta el número 0 en el display ("0b11100110")
+//			{
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
+//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
+//								break;
+//			}								
+//		}
+//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
+//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
+//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_SET);
+//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
+//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
+//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
+//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
 }
 
 void enable_lights(bool EN)
@@ -262,6 +262,14 @@ void RGB_Control ()
 				}
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == GPIO_PIN_0)
+	{
+			flag = !flag;
+	}
+}
+
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
 {
 			Joystick_V = ADC_buffer [0];
@@ -279,9 +287,12 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
 						enable_lights(true); // en caso de que haya más luz de la esperada enciende las luces
 				}
 				
-				Display_control(Intensidad); // le pasa el valor del potenciómetro a la funciçon para poder decodificar el valor y representarlo en el display
+				// Display_control(Intensidad); // le pasa el valor del potenciómetro a la funciçon para poder decodificar el valor y representarlo en el display
 				
-				RGB_Control();
+				if(flag == 0)
+				{
+						RGB_Control();
+				}
 }
 
 /* USER CODE END 0 */
@@ -423,7 +434,7 @@ static void MX_ADC1_Init(void)
 
     /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
     */
-  sConfig.Channel = ADC_CHANNEL_0;
+  sConfig.Channel = ADC_CHANNEL_3;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
@@ -585,15 +596,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : RGB_Enable_Pin */
-  GPIO_InitStruct.Pin = RGB_Enable_Pin;
+  /*Configure GPIO pin : RGB_setter_Pin */
+  GPIO_InitStruct.Pin = RGB_setter_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(RGB_Enable_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(RGB_setter_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
 }
 
