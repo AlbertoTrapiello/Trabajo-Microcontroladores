@@ -49,16 +49,6 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define c_Pin GPIO_PIN_2
-#define c_GPIO_Port GPIOE
-#define d_Pin GPIO_PIN_3
-#define d_GPIO_Port GPIOE
-#define e_Pin GPIO_PIN_4
-#define e_GPIO_Port GPIOE
-#define f_Pin GPIO_PIN_5
-#define f_GPIO_Port GPIOE
-#define g_Pin GPIO_PIN_6
-#define g_GPIO_Port GPIOE
 #define RGB_setter_Pin GPIO_PIN_0
 #define RGB_setter_GPIO_Port GPIOA
 #define RGB_setter_EXTI_IRQn EXTI0_IRQn
@@ -77,9 +67,19 @@
 #define Intensity_Pin GPIO_PIN_14
 #define Intensity_GPIO_Port GPIOE
 #define a_Pin GPIO_PIN_0
-#define a_GPIO_Port GPIOE
+#define a_GPIO_Port GPIOD
 #define b_Pin GPIO_PIN_1
-#define b_GPIO_Port GPIOE
+#define b_GPIO_Port GPIOD
+#define c_Pin GPIO_PIN_2
+#define c_GPIO_Port GPIOD
+#define d_Pin GPIO_PIN_3
+#define d_GPIO_Port GPIOD
+#define e_Pin GPIO_PIN_4
+#define e_GPIO_Port GPIOD
+#define f_Pin GPIO_PIN_5
+#define f_GPIO_Port GPIOD
+#define g_Pin GPIO_PIN_6
+#define g_GPIO_Port GPIOD
 
 /* ########################## Assert Selection ############################## */
 /**

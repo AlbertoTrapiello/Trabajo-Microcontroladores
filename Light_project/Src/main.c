@@ -44,15 +44,17 @@
 #include <stdbool.h>
 
 //Defines
-#define umbral_luz 200
+#define umbral_luz 200 // umbral que determina si hay o no luz
+#define lim1 800 // límite asociado a un extremo del eje del potenciómetro
+#define lim2 1200 // límite asociado a un extremo del eje del potenciómetro
 
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
-DMA_HandleTypeDef hdma_adc1;
+ADC_HandleTypeDef hadc1; // structura del Analog Digital Converter que guarda toda la configuración
+DMA_HandleTypeDef hdma_adc1; // // structura del Direct MEmory Acces del Analog Digital Converter que guarda toda la configuración
 
-TIM_HandleTypeDef htim1;
+TIM_HandleTypeDef htim1; // structura del Temporizador que guarda toda la configuración
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -78,191 +80,222 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 //Variables
 
-int i;
 volatile uint32_t ADC_buffer[4]; // Buffer que guarda los valores analógicos que se leen desde la DMA
 int Intensidad = 0; // Valor del duty cycle que representará la intensidad a la que ilumina el LED seleccionado
 bool R, L, U, D; // boolean variables para definir posición del joystick
 volatile uint32_t Joystick_V, Joystick_H, LDR, Potentiometer; // Valores analógicos de los ejes X e Y del Joystic respectivamente y de la LDR y el potenciómetro
 uint32_t num; // variable para representar en el display
+
+// Valores que guardan el duty cycle de cada una de las luces
+
 int Red_light, Green_light, Blue_light;
-volatile bool flag = 0;
+
+volatile bool flag = 0; // flag que simboliza la interrupción
+
 //Funciones
 
 void map ()// funcion encargada de traducir el valor analógico leído del Joystick a valores de dcha, izq, arriba y abajo o lo que se precise
 {
 	R = L = U = D = 0;
-	if (ADC_buffer[0] < 800)
+	if (ADC_buffer[0] < lim1)
 		R = 1;
-	if (ADC_buffer[0] > 1200)
+	if (ADC_buffer[0] > lim2)
 		L = 1;
-	if (ADC_buffer[1] < 800)
+	if (ADC_buffer[1] < lim1)
 		D = 1;
-	if (ADC_buffer[1] > 1200)
+	if (ADC_buffer[1] > lim2)
 		U = 1;
 }
 
 void Display_control (uint32_t P) // Decodifica el valor del potenciómetro y lo representa en el display
 {
 		num = P%10; //asocia al valor de la lectura analógica un número entre 0 y 97
-//		switch (num)
-//		{
-//			case 0:		// Display = 0xFC; //Respresenta el número 0 en el display ("0b11111100")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);								
-//				break;				
-//			}
-//			case 1:		// Display = 0x60; //Respresenta el número 0 en el display ("0b01100000")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
-//				break;				
-//			}
-//			case 2:		// Display = 0xDA; //Respresenta el número 0 en el display ("0b11011010")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
-//				break;				
-//			}
-//			case 3:		// Display = 0xF2; //Respresenta el número 0 en el display ("0b11110010")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
-//				break;				
-//			}
-//			case 4:		// Display = 0x66; //Respresenta el número 0 en el display ("0b01100110")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-//				break;				
-//			}
-//			case 5:		// Display = 0xB6; //Respresenta el número 0 en el display ("0b10110110")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-//				break;				
-//			}
-//			case 6:		// Display = 0xBE; //Respresenta el número 0 en el display ("0b10111110")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-//				break;				
-//			}
-//			case 7:		// Display = 0xE0; //Respresenta el número 0 en el display ("0b11100000")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
-//				break;				
-//			}
-//			case 8:		// Display = 0xFE; //Respresenta el número 0 en el display ("0b11111110")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-//								break;				
-//			}
-//			case 9:		// Display = 0xE6; //Respresenta el número 0 en el display ("0b11100110")
-//			{
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_RESET);
-//								HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_RESET);	
-//								break;
-//			}								
-//		}
-//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_0,  GPIO_PIN_SET);
-//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_1,  GPIO_PIN_SET);
-//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_2,  GPIO_PIN_SET);
-//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_3,  GPIO_PIN_SET);
-//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_4,  GPIO_PIN_SET);
-//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5,  GPIO_PIN_SET);
-//		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6,  GPIO_PIN_SET);	
+		if (num == 9)
+				num = 9; // Para evitar que se pase del máximo
+		switch (num)
+		{
+			case 0:		// Display = 0xFC; //Respresenta el número 0 en el display ("0b11111100")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_RESET);								
+				break;				
+			}
+			case 1:		// Display = 0x60; //Respresenta el número 0 en el display ("0b01100000")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_RESET);	
+				break;				
+			}
+			case 2:		// Display = 0xDA; //Respresenta el número 0 en el display ("0b11011010")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_SET);	
+				break;				
+			}
+			case 3:		// Display = 0xF2; //Respresenta el número 0 en el display ("0b11110010")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_SET);	
+				break;				
+			}
+			case 4:		// Display = 0x66; //Respresenta el número 0 en el display ("0b01100110")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_SET);	
+				break;				
+			}
+			case 5:		// Display = 0xB6; //Respresenta el número 0 en el display ("0b10110110")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_SET);	
+				break;				
+			}
+			case 6:		// Display = 0xBE; //Respresenta el número 0 en el display ("0b10111110")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_SET);	
+				break;				
+			}
+			case 7:		// Display = 0xE0; //Respresenta el número 0 en el display ("0b11100000")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_RESET);	
+				break;				
+			}
+			case 8:		// Display = 0xFE; //Respresenta el número 0 en el display ("0b11111110")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_SET);	
+								break;				
+			}
+			case 9:		// Display = 0xE6; //Respresenta el número 0 en el display ("0b11100110")
+			{
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_RESET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_SET);
+								HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_SET);	
+								break;
+			}								
+		}
+		
+		// Apaga el Display tras cada ciclo
+			
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_1,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_3,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_5,  GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6,  GPIO_PIN_RESET);	
 }
 
-void enable_lights(bool EN)
+void enable_lights(bool EN) // Función que determina si cuándo se iluminan las luces
 {
 		if (EN)
 		{
-					__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, Intensidad);
+					__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, Intensidad); // Iluminan los LEDs con la intensidad determinada por el potenciómetro
 		}
 		else
-					__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 0);
+					__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_4, 0); // Apaga los LEDs en caso de que haya luz
 }
 
 void RGB_Control ()
 {
-				map();// mapea el valor del joystick
-				if(U)
+				map();// mapea el valor del joystick para determinar la posición en la que se encuentra
+	
+				if(U) //En caso de que esté arriba iluminan dos luces de modo que cada una tenga un valor disstinto
 				{
 						Red_light = 100 - (Joystick_V%100);
+						Blue_light = Joystick_H - Joystick_V%100;
+					
+					  // Ilumina en función de los valores analógicos
+										
 						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, Red_light);
-				}
-				if(D)
-				{
-						Green_light = Joystick_V%100;
-						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, Green_light);
-				}
-				if(R)
-				{
-						Blue_light = Joystick_H- (Joystick_V%100);
 						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, Blue_light);
 				}
-				if(L)
+				if(D) //En caso de que esté abajo iluminan dos luces de modo que cada una tenga un valor disstinto
 				{
-						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 0);
-						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, 0);
+						Green_light = Joystick_V%100;
+						Red_light = Joystick_H%100;
+					
+					  // Ilumina en función de los valores analógicos
+										
+						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, Green_light);
+						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, Red_light);
+				}
+				if(R) //En caso de que esté a la derecha iluminan dos luces de modo que cada una tenga un valor disstinto
+				{
+						Blue_light = Joystick_H- (Joystick_V%100);
+						Green_light = Joystick_V%100;
+					
+					  // Ilumina en función de los valores analógicos
+										
+						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, Blue_light);
+						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, Green_light);
+				}
+				if(L) //En caso de que esté a la izquierda iluminan las tres luces de modo que cada una tenga un valor disstinto
+				{
+						Blue_light = Joystick_H- (Joystick_V%100);
+						Green_light = Joystick_V%100;
+						Red_light = 100 - (Joystick_V%100);
+					
+					  // Ilumina en función de los valores analógicos
+					
+						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, Blue_light);
+						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, Green_light);
+						__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, Red_light);
 				}
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) // Callback de la interrupción
 {
 	if (GPIO_Pin == GPIO_PIN_0)
 	{
@@ -270,15 +303,18 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 }
 
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1) // Callback del DMA
 {
-			Joystick_V = ADC_buffer [0];
+			// Asignaciones de las lecturas guardadas en el ADC_buffer con sus respectivas varibales
+			Joystick_V = ADC_buffer [0]; 
 			Joystick_H = ADC_buffer [1];
 			LDR = ADC_buffer [2];
 			Potentiometer = ADC_buffer [3];
-	
-			Intensidad = ((Potentiometer)/100)%100;
-							if(LDR < umbral_luz)
+		
+			// Programa
+		
+			Intensidad = ((Potentiometer)/100)%100; // Transforma el valor de la lectura analógica a un valor asociado al duty cycle de los LEDs
+				if(LDR < umbral_luz) // La lectura de la resistencia está por debajo del umbral
 				{
 						enable_lights(false); // en caso de que haya más luz de la esperada apaga las luces
 				}
@@ -287,11 +323,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
 						enable_lights(true); // en caso de que haya más luz de la esperada enciende las luces
 				}
 				
-				// Display_control(Intensidad); // le pasa el valor del potenciómetro a la funciçon para poder decodificar el valor y representarlo en el display
+				Display_control(Intensidad); // le pasa el valor del potenciómetro a la funciçon para poder decodificar el valor y representarlo en el display
 				
-				if(flag == 0)
+				if(flag == 0) // flag que indica que se ha pulsado el botón
 				{
-						RGB_Control();
+						RGB_Control(); // Llama a la función que controla el cambio del color del led RGB
 				}
 }
 
@@ -338,7 +374,7 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 	
-	HAL_ADC_Start_DMA (&hadc1, ADC_buffer, 4);
+	HAL_ADC_Start_DMA (&hadc1, ADC_buffer, 4); // le pasa al DMA el vector donde guardará los valores leídos en los canales
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -580,27 +616,28 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, c_Pin|d_Pin|e_Pin|f_Pin 
-                          |g_Pin|a_Pin|b_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pins : c_Pin d_Pin e_Pin f_Pin 
-                           g_Pin a_Pin b_Pin */
-  GPIO_InitStruct.Pin = c_Pin|d_Pin|e_Pin|f_Pin 
-                          |g_Pin|a_Pin|b_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOD, a_Pin|b_Pin|c_Pin|d_Pin 
+                          |e_Pin|f_Pin|g_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : RGB_setter_Pin */
   GPIO_InitStruct.Pin = RGB_setter_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(RGB_setter_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : a_Pin b_Pin c_Pin d_Pin 
+                           e_Pin f_Pin g_Pin */
+  GPIO_InitStruct.Pin = a_Pin|b_Pin|c_Pin|d_Pin 
+                          |e_Pin|f_Pin|g_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
