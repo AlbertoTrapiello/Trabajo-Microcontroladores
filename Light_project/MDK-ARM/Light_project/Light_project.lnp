@@ -1,0 +1,26 @@
+--cpu=Cortex-M4.fp
+"light_project\startup_stm32f411xe.o"
+"light_project\main.o"
+"light_project\stm32f4xx_it.o"
+"light_project\stm32f4xx_hal_msp.o"
+"light_project\stm32f4xx_hal_adc.o"
+"light_project\stm32f4xx_hal_adc_ex.o"
+"light_project\stm32f4xx_hal_tim.o"
+"light_project\stm32f4xx_hal_tim_ex.o"
+"light_project\stm32f4xx_hal_rcc.o"
+"light_project\stm32f4xx_hal_rcc_ex.o"
+"light_project\stm32f4xx_hal_flash.o"
+"light_project\stm32f4xx_hal_flash_ex.o"
+"light_project\stm32f4xx_hal_flash_ramfunc.o"
+"light_project\stm32f4xx_hal_gpio.o"
+"light_project\stm32f4xx_hal_dma_ex.o"
+"light_project\stm32f4xx_hal_dma.o"
+"light_project\stm32f4xx_hal_pwr.o"
+"light_project\stm32f4xx_hal_pwr_ex.o"
+"light_project\stm32f4xx_hal_cortex.o"
+"light_project\stm32f4xx_hal.o"
+"light_project\system_stm32f4xx.o"
+--library_type=microlib --strict --scatter "Light_project\Light_project.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "Light_project.map" -o Light_project\Light_project.axf
